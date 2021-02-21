@@ -1,8 +1,61 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int partition(int** A, int left, int right)
+{
+	int low, high;
+	int pivot;
+	int temp_doc;
+	int temp_inter;
 
+	low = left;
+	high = right+1;
+	pivot = A[left][0];
 
+	do{
+		do{
+			low++;
+		}while(low <= right && A[low][0] < pivot);
+
+		do{
+			high--;
+		} while(high >= left && A[high][0] > pivot);
+
+		if(low < high) {
+			temp_doc = A[low][0];
+			temp_inter = A[low][1];
+
+			A[low][0] = A[high][0];
+			A[low][1] = A[high][1];
+
+			A[high][0] = temp_doc;
+			A[high][1] = temp_inter;
+		}
+
+	} while(low < high);
+
+		temp_doc = A[left][0];
+		temp_inter = A[left][1];
+		
+		A[left][0] = A[high][0];
+		A[left][1] = A[high][1];
+
+		A[high][0] = temp_doc;
+		A[high][1] = temp_inter;
+
+		return high;
+}
+
+void quick_sort(int** A, int left, int right)
+{
+	int q;
+
+	if(left < right){
+		q = partition(A,left,right);
+		quick_sort(A,left,q-1);
+		quick_sort(A,q+1,right);
+	}
+}
 
 int main(){
 
@@ -17,6 +70,8 @@ int main(){
 		int **data;
 		int i,j;
 		int N;
+		int result;
+		int RankInterview;
 
 		scanf("%d",&N);
 
@@ -30,8 +85,32 @@ int main(){
 				data[i][j] = 0;
 		//END : Init Data Array
 
+		//START : Input Data
 		for(i=0; i<N; i++)
-			scanf("%d %d",data[i][0], data[i][1]);
+			scanf("%d %d",&data[i][0], &data[i][1]);
+		//END : Input Data
+
+		quick_sort(data, 0, N-1);
+
+		result = 1;
+		RankInterview = data[0][1];
+
+		for(i=0; i<N; i++)
+		{
+			if(data[i][1] < RankInterview)
+			{
+				result++;
+				RankInterview = data[i][1];
+			}
+		}
+
+
+/* TEST CODE
+		for(i=0; i<N; i++)
+			printf("%d %d\n",data[i][0], data[i][1]);
+*/
+
+		printf("%d\n",result);
 		
 		//START : deInit Data Array
 		for(i=0; i<N; i++)
