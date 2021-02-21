@@ -94,7 +94,7 @@ int main(){
 			scanf("%d %d",&data[i][0], &data[i][1]);
 		//END : Input Data
 
-		merge_sort(data, 0, N-1);
+		merge_sort(data, sorted, 0, N-1);
 
 // TEST CODE
 //		for(i=0; i<N; i++)
