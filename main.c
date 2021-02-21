@@ -1,59 +1,57 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int partition(int** A, int left, int right)
+void merge(int** A, int** sorted, int left, int mid, int right)
 {
-	int low, high;
-	int pivot;
-	int temp_doc;
-	int temp_inter;
+	int i,j,k,l;
+	
+	k = left;
 
-	low = left;
-	high = right+1;
-	pivot = A[left][0];
+	i = left;
+	j = mid + 1;
 
-	do{
-		do{
-			low++;
-		}while(low <= right && A[low][0] < pivot);
-
-		do{
-			high--;
-		} while(high >= left && A[high][0] > pivot);
-
-		if(low < high) {
-			temp_doc = A[low][0];
-			temp_inter = A[low][1];
-
-			A[low][0] = A[high][0];
-			A[low][1] = A[high][1];
-
-			A[high][0] = temp_doc;
-			A[high][1] = temp_inter;
+	while(i <= mid && j <= right){
+		if(A[i][0] > A[j][0])
+		{
+			sorted[k][0] = A[j][0];
+			sorted[k++][1] = A[j++][1];
+		} else {
+			sorted[k][0] = A[i][0];
+			sorted[k++][1] = A[i++][1];
 		}
+	}
 
-	} while(low < high);
+	if(i > mid){
+		for(l=j; l<=right; l++)
+		{
+			sorted[k][0] = A[l][0];
+			sorted[k++][1] = A[l][1];
+		}
+	}
+	else {
+		for(l=i; l<=mid; l++)
+		{
+			sorted[k][0] = A[l][0];
+			sorted[k++][1] = A[l][1];
+		}
+	}
 
-		temp_doc = A[left][0];
-		temp_inter = A[left][1];
-		
-		A[left][0] = A[high][0];
-		A[left][1] = A[high][1];
-
-		A[high][0] = temp_doc;
-		A[high][1] = temp_inter;
-
-		return high;
+	for(i=left; i<= right; i++)
+	{
+		A[i][0] = sorted[i][0];
+		A[i][1] = sorted[i][1];
+	}
 }
 
-void quick_sort(int** A, int left, int right)
+void merge_sort(int** A, int** sorted, int left, int right)
 {
-	int q;
+	int mid;
 
 	if(left < right){
-		q = partition(A,left,right);
-		quick_sort(A,left,q-1);
-		quick_sort(A,q+1,right);
+		mid = (left + right) / 2;
+		merge_sort(A, sorted, left, mid);
+		merge_sort(A, sorted, mid+1, right);
+		merge(A, sorted, left, mid, right);
 	}
 }
 
@@ -68,6 +66,7 @@ int main(){
 
 	while(T){
 		int **data;
+		int **sorted;
 		int i,j;
 		int N;
 		int result;
@@ -77,12 +76,17 @@ int main(){
 
 		//START : Init Data Array
 		data = (int**)malloc(sizeof(int*)*N);
-		for(i=0; i<N; i++)
+		sorted = (int**)malloc(sizeof(int*)*N);
+		for(i=0; i<N; i++){
 			data[i] = (int*)malloc(sizeof(int)*2);
+			sorted[i] = (int*)malloc(sizeof(int)*2);
+		}
 		
 		for(i=0; i<N; i++)
-			for(j=0; j<2; j++)
+			for(j=0; j<2; j++){
 				data[i][j] = 0;
+				sorted[i][j] = 0;
+			}
 		//END : Init Data Array
 
 		//START : Input Data
@@ -90,7 +94,11 @@ int main(){
 			scanf("%d %d",&data[i][0], &data[i][1]);
 		//END : Input Data
 
-		quick_sort(data, 0, N-1);
+		merge_sort(data, 0, N-1);
+
+// TEST CODE
+//		for(i=0; i<N; i++)
+//			printf("%d %d\n",data[i][0], data[i][1]);
 
 		result = 1;
 		RankInterview = data[0][1];
@@ -104,18 +112,15 @@ int main(){
 			}
 		}
 
-
-/* TEST CODE
-		for(i=0; i<N; i++)
-			printf("%d %d\n",data[i][0], data[i][1]);
-*/
-
 		printf("%d\n",result);
 		
 		//START : deInit Data Array
-		for(i=0; i<N; i++)
+		for(i=0; i<N; i++){
 			free(data[i]);
+			free(sorted[i]);
+		}
 		free(data);
+		free(sorted);
 		//END : deInit Data Array
 		
 		T--;
